@@ -1,5 +1,5 @@
-## Backgound
-This is a custom visual built for PowerBI to support rout visualization. Route map basically visualizes trajectories of objects, such as taxies, vessels, airplanes, and hurricans.
+## Background
+This is a custom visual built for PowerBI to support rout visualization. Route map basically visualizes trajectories of objects, such as taxies, vessels, airplanes, and hurricanes.
 
 ![](assets/screenshot.png)
 
@@ -13,7 +13,7 @@ This is a custom visual built for PowerBI to support rout visualization. Route m
     * **Tooltip**: Values here will be displayed when hovering over route arrows.
 
 * Special settings:
-    * **Legend**: You can customize labels for colors, widths, and dashe types. If the labels are empty, they will not show in the legend.
+    * **Legend**: You can customize labels for colors, widths, and dash types. If the labels are empty, they will not show in the legend.
     * **Arrow** - **Interval**: This controls the sparseness of arrows. Too many arrows may cause visual clutter and slow down the performance.
     * **Dash**: There are several dash types available. However, drawing very long dashed lines may slow down your browser.
     * **Advanced** - **Ignore zeros** and **Ignore invalids**: These are two simple safeguards of the visual. If geo-locations are all zeros, i.e., _(0,0)_, or invalid, i.e., _abs(latitude) > 85.05112878 or abs(longitude) < 180_, they will be excluded from the visual. These two switches are on by default.
