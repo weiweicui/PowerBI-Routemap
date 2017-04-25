@@ -1,37 +1,23 @@
-## Welcome to GitHub Pages
+## Backgound
+This is a custom visual built for PowerBI to support rout visualization.
 
-You can use the [editor on GitHub](https://github.com/weiweicui/PowerBI-Routemap/edit/master/README.md) to maintain and preview the content for your website in Markdown files.
+![](assets/screenshot.png)
 
-Whenever you commit to this repository, GitHub Pages will run [Jekyll](https://jekyllrb.com/) to rebuild the pages in your site, from the content in your Markdown files.
+## How to Use
+* Required fields: 
+    * **Timestamp**: Values in this field are used to decide the chronological order of the records. These values can be anything sortables, such as numbers and dates.
+    * **Latitude** and **Longitude**: Geo-coordinates for the records. 
+* Optional fields:
+    * **Segment**: Records are grouped into routs based on this field. If not specified, all records are connected together.
+    * **Color/Width/Dash Legend**: If specified, you can customize the route styles in the _Format_ tab.
+    * **Tooltip**: Values here will be displayed when hovering over route arrows.
 
-### Markdown
+* Special settings:
+    * **Legend**: You can customize labels to for different colors, widths, and dashes. If the labels are empty, they will not show in the legend.
+    * **Arrow** - **Interval**: This controls the sparseness of arrows. Too many arrows may cause visual clutter and slow down the performance.
+    * **Dash**: They are dash types available. However, drawing very long dashed routes may slow down your browser.
+    * **Advanced** - **Ignore zeros** and **Ignore invalids**: These are simple safeguards of the visual. If geo-locations are all zeros, i.e., _(0,0)_, or invalid, i.e., _Math.abs(latitude) > 85.05112878 or Math.abs(longitude) < 180_, they will be ignored from the visual. These two switches are on by default.
+* Need more help? Please leave a comment [here](https://weiweicui.github.io/PowerBI-Routemap).
 
-Markdown is a lightweight and easy-to-use syntax for styling your writing. It includes conventions for
-
-```markdown
-Syntax highlighted code block
-
-# Header 1
-## Header 2
-### Header 3
-
-- Bulleted
-- List
-
-1. Numbered
-2. List
-
-**Bold** and _Italic_ and `Code` text
-
-[Link](url) and ![Image](src)
-```
-
-For more details see [GitHub Flavored Markdown](https://guides.github.com/features/mastering-markdown/).
-
-### Jekyll Themes
-
-Your Pages site will use the layout and styles from the Jekyll theme you have selected in your [repository settings](https://github.com/weiweicui/PowerBI-Routemap/settings). The name of this theme is saved in the Jekyll `_config.yml` configuration file.
-
-### Support or Contact
-
-Having trouble with Pages? Check out our [documentation](https://help.github.com/categories/github-pages-basics/) or [contact support](https://github.com/contact) and we’ll help you sort it out.
+***
+{% include disqus_comments.html %}
