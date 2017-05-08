@@ -3,6 +3,10 @@ This is a custom visual built for PowerBI to support rout visualization. Route m
 
 ![](assets/screenshot.png)
 
+## Where to Get It
+
+The visual has been submitted to the Ofice Store and will appear there soon. You can also find them in the [_dist_](https://github.com/weiweicui/PowerBI-Routemap/tree/master/dist) folder in this repo.
+
 ## How to Use
 * Required fields: 
     * **Timestamp**: Values in this field are used to decide the chronological order of the records. These values can be anything sortable, such as numbers and dates.
