@@ -5,7 +5,7 @@ This is a custom visual built for PowerBI to support rout visualization. Route m
 
 ## Where to Get It
 
-The visual has been submitted to the Ofice Store and will appear there soon. You can also find them in the [_dist_](https://github.com/weiweicui/PowerBI-Routemap/tree/master/dist) folder in this repo.
+The visual has been submitted to the Ofice Store and will appear there soon. You can also find them in the [_dist_]() folder in this repo.
 
 ## How to Use
 * Required fields: 
