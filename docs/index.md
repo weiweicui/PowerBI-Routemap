@@ -19,6 +19,9 @@ This is a custom visual built for PowerBI to support rout visualization. Route m
 
 You can get it from the [_Office Store_](https://store.office.com/en-us/app.aspx?assetid=WA104380985&sourcecorrid=95716b6f-f393-4115-9447-5bbfa5b95537&searchapppos=0&ui=en-US&rs=en-US&ad=US&appredirect=false) or in the [_dist_](https://github.com/weiweicui/PowerBI-Routemap/tree/master/dist) folder of this [_repo_](https://github.com/weiweicui/PowerBI-Routemap).
 
+* Update 1.0.1:
+    * Add **Advanced - Language**: Can change the language used by the background map.
+
 # How to Use
 * Required fields: 
     * **Timestamp**: Values in this field are used to decide the chronological order of the records. These values can be anything sortable, such as numbers and dates.
