@@ -21,6 +21,8 @@ You can get it from the [_Office Store_](https://store.office.com/en-us/app.aspx
 
 * Update 1.0.1:
     * Add **Advanced - Language**: Can change the language used by the background map.
+* Update 1.1.2:
+    * Handle routes that cross the antimeridian.
 
 # How to Use
 * Required fields: 
