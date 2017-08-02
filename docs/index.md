@@ -23,6 +23,10 @@ You can get it from the [_Office Store_](https://store.office.com/en-us/app.aspx
     * Add **Advanced - Language**: Can change the language used by the background map.
 * Update 1.1.2:
     * Handle routes that cross the antimeridian.
+* Update 1.2.1:
+    * Add **Map control** format: Map-related controls are moved here (from **Advance**). Some more controls are added, such as map type.
+    * Add **Map element** format: If you find some map element distracting, you can turn them off here to give you a clearer background.
+    * Fix some bugs and improve the cross-filtering performance.
 
 # How to Use
 * Required fields: 
