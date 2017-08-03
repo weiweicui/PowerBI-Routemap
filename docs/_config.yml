@@ -5,3 +5,6 @@ baseurl: "PowerBI-Routemap"
 
 # Build settings
 theme: minima
+
+disqus: weiweicui-routemap
+name: https://weiweicui.github.io/PowerBI-Routemap/
