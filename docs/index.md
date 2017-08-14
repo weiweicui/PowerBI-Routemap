@@ -27,6 +27,11 @@ You can get it from the [_Office Store_](https://store.office.com/en-us/app.aspx
     * Add **Map control** format: Map-related controls are moved here (from **Advance**). Some more controls are added, such as map type.
     * Add **Map element** format: If you find some map element distracting, you can turn them off here to give you a clearer background.
     * Fix some bugs and improve the cross-filtering performance.
+* Update 1.2.2:
+    * Revise **Glyphs - Middle - Interval**: Now arrows are evenly distrbuted on routes.
+    * Revise **Glyphs - End**: Now you can change the glyphs placed at end points. There are several built-in shapes, such as cars and ships. You can also choose the option `Customize` to pass in any shape. By now, the customization is a little tricky. You cannot drag-n-drop or open one from the file system. Instead, you need to provide a valid svg shape as a plain text. For example, this is a upward triangle glyph `<path d="m0,-16l-10,20l20,0z"/>`, and this is a circle `<circle cx="0" cy="0" r="10"/>`. Details about the format can be found [here](https://www.w3schools.com/graphics/svg_intro.asp). But you can also use svg editor, like [this one](http://www.clker.com/inc/svgedit/svg-editor.html), to draw shapes and extract the corresponding text. Also, when building your own shapes, please note that:
+        * We align the route end with the (0,0) coordinate of the svg shape.
+        * If your want to align the glyph direction with the route, please point your glyph to the right.
 
 # How to Use
 * Required fields: 
