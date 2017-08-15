@@ -29,11 +29,11 @@ You can get it from the [_Office Store_](https://store.office.com/en-us/app.aspx
     * Fix some bugs and improve the cross-filtering performance.
 * Update 1.2.2:
     * Revise **Glyphs - Middle - Interval**: Now arrows are evenly distrbuted on routes.
-    * Revise **Glyphs - End**: Now you can change the glyphs placed at end points. There are several built-in shapes, such as cars and ships. You can also choose the option `Customize` to pass in any shape. By now, the customization is a quite tricky and requires some programming skills. You cannot drag-n-drop or open one from the file system. Instead, you need to provide a valid svg shape as a plain text. For example, this is a upward triangle glyph `<path d="m0,-16l-10,20l20,0z"/>`, and this is a circle `<circle cx="0" cy="0" r="10"/>`. Our visual taks this kind of text as custom icons. Details about the format can be found [here](https://www.w3schools.com/graphics/svg_intro.asp). But you can also use online svg editors, like [this one](http://www.clker.com/inc/svgedit/svg-editor.html), to draw shapes and extract the corresponding text. When building your own shapes, please note that:
-        * We align the route end with the (0,0) coordinate of the svg shape. So you should the anchor of your shape at (0,0);
-        * If your want to align the glyph direction with the route, please point your glyph to the right.
-        * If you want to color the glyphs based on the route data, please do not include the `fill` attribute in your input text.
-        * Sorry for the complexity. Will update this when finding an easier solution.
+    * Revise **Glyphs - End**: Now you can change the glyphs placed at end points. There are several built-in shapes, such as cars and ships. You can also choose the option `Customize` to pass in any shape. By now, the customization is quite tricky and requires some programming background. You cannot drag-n-drop or open one from the file system. Instead, you need to provide a valid svg shape as a plain text. For example, this is a upward triangle `<path d="m0,-16l-10,20l20,0z"/>`, and this is a circle `<circle cx="0" cy="0" r="10"/>`. Our visual takes this kind of text as custom icons. Details about the format can be found [here](https://www.w3schools.com/graphics/svg_intro.asp). But you can also use online svg editors, like [this one](http://www.clker.com/inc/svgedit/svg-editor.html), to draw a shape and extract the corresponding text. When building your own shapes, please note that:
+        * We align the route end with the (0,0) coordinate of the svg shape. So you should anchor your shape at (0,0).
+        * If you want to align the glyph direction with the route, please point your glyph to the right.
+        * If you want to color glyphs based on the route data, please do not include the `fill` attribute in your input text.
+        * Sorry for the complexity. Will update this when find an easier solution.
 
 # How to Use
 * Required fields: 
