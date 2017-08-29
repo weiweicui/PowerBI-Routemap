@@ -34,6 +34,11 @@ You can get it from the [_Office Store_](https://store.office.com/en-us/app.aspx
         * If you want to align the glyph direction with the route, please point your glyph to the right.
         * If you want to color glyphs based on the route data, please do not include the `fill` attribute in your input text.
         * Sorry for the complexity. Will update this when find an easier solution.
+* Update 1.2.8:
+    * Add **Custom image** option to **Glyphs - End**. Now you can input a valid url to place a jpeg or png image at path ends. Please note that:
+        * We align the route end with the image center.
+        * We also consider the right is the direction of the image if the `Directional` option is on.
+
 
 # How to Use
 * Required fields: 
