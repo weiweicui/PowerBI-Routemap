@@ -1,0 +1,22 @@
+{
+    "compilerOptions": {
+        "target": "es5",
+        "allowJs": true,
+        "module": "es2015",
+        "sourceMap": false,
+        "moduleResolution": "node",
+        "outDir": ".bundle",
+        "baseUrl": ".",
+        "paths": {
+            "*": [
+                "./src/.lib/*",
+                "./lava/*"
+            ]
+        }
+    },
+    "files": [
+        "./lava/d3/v4.ext.d.ts",
+        "visual/.api/v1.6.0/PowerBI-visuals.d.ts",
+        "src/visual.ts"
+    ]
+}
