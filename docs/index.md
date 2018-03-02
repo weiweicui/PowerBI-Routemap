@@ -41,8 +41,8 @@ You can get it from the [_Office Store_](https://store.office.com/en-us/app.aspx
 * Update 1.2.12:
     * Fix some bugs.
     * Adjust the **Glyphs - End** panel: Now you can choose from four different directions for your custom shapes or images.
-
-
+* Update 1.3.1:
+    * Fix the tooltip may not update issue.
 
 # How to Use (Latest Version)
 * Required fields: 
