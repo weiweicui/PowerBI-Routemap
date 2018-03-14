@@ -37,7 +37,6 @@ class Context extends Grand<Role, Format> {
 
     update(view: powerbi.DataView): void{
         super.update(view);
-        debugger;
         if (this.invalid()) {
             $cfg.legend = { color: {}, thick: {}, style: {} }
             reset({});
@@ -143,7 +142,7 @@ export class Visual implements powerbi.extensibility.visual.IVisual {
                 }
                 return columns.map(col => <any>{
                     displayName: col.source.displayName,
-                    value: col.values[row]
+                    value: col.values[row] + ""
                 });
             });
         });
@@ -187,15 +186,6 @@ export class Visual implements powerbi.extensibility.visual.IVisual {
             return;
         }
         var view = options.dataViews[0] || {} as powerbi.DataView;
-        // d3.select(this._div).selectAll('#bug').remove();
-        // if (view && view.metadata && view.metadata.objects && view.metadata.objects['advance'] && view.metadata.objects['advance']['debug']) {            
-        //     let bug = d3.select(this._div).append('textarea').attr('rows', 10).attr('cols', 50).att.id('bug').sty.position('absolute').sty.top('0px');
-        //     let info = { meta: view.metadata.objects };
-        //     if ($con.column('stamp', view)) {
-        //         info['stamp'] = $con.column('stamp', view).values;
-        //     }
-        //     bug.text(JSON.stringify(info));
-        // }
 
         if (!$mapctl) {
             this._options = options;
@@ -235,6 +225,7 @@ export class Visual implements powerbi.extensibility.visual.IVisual {
         if (options.type === powerbi.VisualUpdateType.ViewMode) {
             return;
         }
+
         ctx.update(view);
         console.log("update done");
     }

@@ -2,6 +2,7 @@ import { Category } from './data';
 import { Func, StringMap, partial, values, keys, copy, pick, dict, find } from "type";
 import { host, Persist } from "./host";
 import { groupBy, obj } from './misc';
+import { selectAll, select } from 'd3-selection';
 
 type Instance = powerbi.VisualObjectInstance;
 
@@ -63,6 +64,18 @@ export class Formatter<T> implements IFormatter<T> {
         }
         if (typeof toggle === 'boolean') {
             this._binds[pname].active = toggle as boolean;
+        }
+    }
+
+    public initPersist(view: powerbi.DataView) {
+        if (this.oname === 'color') {
+            debugger;
+        }
+        if (this._persist) {
+            let dict = this._persist.read(view, null);
+            if (dict) {
+                this._persist.value(dict);
+            }
         }
     }
 
@@ -197,8 +210,13 @@ export class Formatter<T> implements IFormatter<T> {
         }
         let all = this._persist.value() || {}, diff = false;
         for (let pname in this._binds) {
-            if (!this._binds[pname].special) {
-                delete all[pname];
+            if (!this._binds[pname].special && all[pname]) {
+                if (format) {
+                    this._binds[pname].special = JSON.parse(all[pname]);
+                }
+                else {
+                    this._persist.value(null);
+                }
             }
         }
         for (let pname in this._binds) {
@@ -207,7 +225,7 @@ export class Formatter<T> implements IFormatter<T> {
                 let dump = this._json(special);
                 if (dump !== all[pname]) {
                     diff = true;
-                    all[pname] = dump;                        
+                    all[pname] = dump;
                 }
             }
         }

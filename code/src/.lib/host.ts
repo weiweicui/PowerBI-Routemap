@@ -35,7 +35,6 @@ export class Persist<T> {
     public static dirty(view: powerbi.DataView): boolean {
         //cannot use _all.some(...), we have to updated every one of them
         var dirty = false;
-        // console.log(Persist._all.map(a => a.oname));
         for (var v of Persist._all) {
             if (v._updated(view)) {
                 dirty = true;

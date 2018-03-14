@@ -431,6 +431,9 @@ export class Grand<R extends string, F> {
         if (!onames || onames.length === 0) {
             onames = keys(this._formatter) as any;
         }
+        for (let key in this._formatter) {
+            this._formatter[key].initPersist(view);
+        }
         for (let oname of onames) {
             this._formatter[oname].init(view);
         }
@@ -509,13 +512,13 @@ export class Grand<R extends string, F> {
     private _updateFormat(view: powerbi.DataView): void {
         this._dirtyFormat = false;
         let cater = (r: R) => this.cat(r);
-        let dirty = this.items.dirty('count') || this.roles.dirty();//we think the data is dirty/filtered
+        let dataDirty = this.items.dirty('count') || this.roles.dirty();//we think the data is dirty/filtered
         let format = (view && view.metadata && view.metadata.objects) || {};
         for (let oname in this._FORMAT) {
-            if (this._formatter[oname].update(cater, format[oname], dirty)) {
+            if (this._formatter[oname].update(cater, format[oname], dataDirty)) {
                 this._dirtyFormat = true;
             }
-        }       
+        }
     }
 
     public update(view: powerbi.DataView): void {
