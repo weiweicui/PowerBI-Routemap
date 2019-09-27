@@ -43,6 +43,11 @@ You can get it from the [_Office Store_](https://store.office.com/en-us/app.aspx
     * Adjust the **Glyphs - End** panel: Now you can choose from four different directions for your custom shapes or images.
 * Update 1.3.1:
     * Fix the tooltip may not update issue.
+* Update 1.4.0:
+    * Update to API 2.6.0, a lot of changes, bugs expected. Please comment below if find any.
+    * Remove the highlight feature. Now it only shows result, but cannot filter values for other visuals.
+    * Add **Color - Autofill**, which can automatically assign distinct colors.
+    * Add **Width - Autofill**. Numbers in the **Width** field are treated as categories, but sometimes we like to direclty use them as route widths. In this case, we can automatically assign the values. Please note that numbers >=32 are ignored (**Default** value is used here) to prevent drawing something insanely thick.
 
 # How to Use (Latest Version)
 * Required fields: 
