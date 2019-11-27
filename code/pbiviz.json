@@ -2,9 +2,9 @@
     "visual": {
         "name": "routemap",
         "displayName": "Route map",
-        "guid": "outemap863828C4992A473C9A5FB6A6B0EDF5DC",
+        "guid": "routemap863828C4992A473C9A5FB6A6B0EDF5DC",
         "visualClassName": "Visual",
-        "version": "1.4.0",
+        "version": "1.4.1",
         "description": "Plot trajectories on a map",
         "supportUrl": "https://weiweicui.github.io/PowerBI-Routemap",
         "gitHubUrl": "https://github.com/weiweicui/PowerBI-Routemap"
