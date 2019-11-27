@@ -43,7 +43,7 @@ You can get it from the [_Office Store_](https://store.office.com/en-us/app.aspx
     * Adjust the **Glyphs - End** panel: Now you can choose from four different directions for your custom shapes or images.
 * Update 1.3.1:
     * Fix the tooltip may not update issue.
-* Update 1.4.0:
+* Update 1.4.*:
     * Update to API 2.6.0, a lot of changes, bugs expected. Please comment below if find any.
     * Remove the highlight feature. Now it only shows result, but cannot filter values for other visuals.
     * Add **Color - Autofill**, which can automatically assign distinct colors.
