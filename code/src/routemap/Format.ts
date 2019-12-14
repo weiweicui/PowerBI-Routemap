@@ -1,5 +1,5 @@
-import { MapFormat } from '../lava/bingmap/controller';
-import { Style } from '../lava/bingmap/routemap/config';
+import { MapFormat } from '../lava/bingmap';
+import { DashType, ShapeType } from '../lava/routemap/config';
 
 export class Format {
     legend = {
@@ -28,7 +28,7 @@ export class Format {
     };
     style = {
         customize: true,
-        item: 'solid' as Style
+        item: 'solid' as DashType
     };
     arrow = {
         show: true,
@@ -42,7 +42,7 @@ export class Format {
         endData: "",
         endImage: "",
         endDirectional: 'up' as 'up' | 'left' | 'down' | 'right',
-        endShape: 'triangle',
+        endShape: 'triangle' as ShapeType | 'customize' | 'image',
         customize: false,
         item: true
     };

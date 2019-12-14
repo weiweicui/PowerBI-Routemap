@@ -1,4 +1,3 @@
-import { IPoint, Func } from "./type";
 import { select, Selection, ValueFn, BaseType } from "d3";
 
 declare module 'd3-selection' {
@@ -8,11 +7,11 @@ declare module 'd3-selection' {
 }
 
 type Value<I, O> = ValueFn<any, I, O> | O;
+type IPoint = { x: number, y: number }
 
 export interface ISelex<D = any> extends Selection<any, D, any, any> {
     att: Attr<D>;
     sty: Style<D>;
-    // select(selector: any): Selection<any, D, any, any> & ISelex<D>;
     datum<NewDatum>(value: ValueFn<any, D, NewDatum>): ISelex<NewDatum>;
     datum<NewDatum>(value: NewDatum): ISelex<NewDatum>;
     datum(value: null): ISelex<D>;
@@ -29,23 +28,13 @@ export interface ISelex<D = any> extends Selection<any, D, any, any> {
     data(): any;
 }
 
-// export type ISelex<D = any> = Selection<any, D, any, any> & {
-//     att: Attr<D>;
-//     sty: Style<D>;
-//     select(selector: BaseType | string): Selection<any, D, any, any> & ISelex<D>;
-//     selex(selector: BaseType | string): ISelex<D>;
-//     selexAll<T = D>(selector: BaseType | string): ISelex<T>;
-//     appendex<K extends keyof ElementTagNameMap, T = D>(tag: K, datum?: T): ISelex<T>;
-//     text(v: string): ISelex<D>;
-// }
-
 class Attr<D = any> {
     private _sel: ISelex<D>;
     constructor(sel: ISelex<D>) {
         this._sel = sel;
     }
 
-    public size(width: number, height: number): ISelex<D> {
+    public size(width: number | string, height: number | string): ISelex<D> {
         this.width(width);
         this.height(height);
         return this._sel;
@@ -333,6 +322,18 @@ class Attr<D = any> {
         }
         else {
             return this._sel.attr('stroke-linecap');
+        }
+    }
+
+    public fill_opacity(v: Value<D, number | null>): ISelex<D>;
+    public fill_opacity(): number
+    public fill_opacity(v?: Value<D, number | null>): any {
+        if (v !== undefined) {
+            this._sel.attr('fill-opacity', v as any);
+            return this._sel;
+        }
+        else {
+            return +this._sel.attr('fill-opacity');
         }
     }
 

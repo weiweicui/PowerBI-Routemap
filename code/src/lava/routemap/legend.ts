@@ -1,25 +1,44 @@
-import { ISelex, selex } from '../../d3';
-import { RoutemapConfig, dash } from './config';
-import { sequence, StringMap, keys } from '../../type';
+import { ISelex, selex } from '../d3';
+import { dash } from './config';
+import { sequence, StringMap, keys } from '../type';
+import { Controller } from '../bingmap';
+
+export class Config {
+    show = false;
+    color = {} as StringMap<string>;//color ==> label
+    thick = {} as StringMap<string>;//number ==> label
+    style = {} as StringMap<string>;//enum ==> label
+    fontSize = 12;
+    position = 'top' as 'top' | 'bottom'
+}
+
 export class Legend {
     private _svg: ISelex;
-    private _config: RoutemapConfig['legend'];
-    constructor(div: ISelex) {
+    private _config = new Config();
+    constructor(div: ISelex, ctl: Controller) {
         this._svg = div.append('svg').sty.position('absolute');
-        this._svg.append('rect').att.fill('white').att.id('mask');
+        this._svg.append('rect').att.fill('white').att.id('mask').att.size('100%', '100%');
         this._svg.append('g').att.id('color');
         this._svg.append('g').att.id('thick');
         this._svg.append('g').att.id('style');
+        ctl.add({ resize: () => this._resize(ctl) });
+        this._resize(ctl);
     }
 
-    public update(width: number, config: RoutemapConfig['legend']): void {
+    private _resize(ctl: Controller) {
+        const width = ctl.map.getWidth(), height = ctl.map.getHeight();
+        this._svg.att.size(width, this._height());
+        const top = this._config.position === 'top' ? -1 : height - this._height() + 2;
+        this._svg.sty.margin_top(top + 'px');
+    }
+
+    public update(config: Config): void {
         this._config = config;
+        this._config.fontSize = +config.fontSize;
+        this._svg.att.height(this._height());
         this._svg.style('display', this._config.show ? null : 'none');
-        const height = this.height();
-        this._svg.att.width(width).att.height(height);
-        this._svg.select('#mask').att.width(width).att.height(height);
         if (this._config.show) {
-            let { color, style, thick } = this._config;
+            const { color, style, thick } = this._config;
             this._restyle(style, this._rethick(thick, this._recolor(color, 0)));
         }
     }
@@ -35,14 +54,10 @@ export class Legend {
     }
 
     private _text(group: ISelex<number>, padding: number, labels: string[], start: number): number {
-        var ty = this._textBase(), offset = [0] as number[], fsize = +this._config.fontSize;
-        group.selectAll('text')
-            .att.x(padding)
-            .att.y(ty)
-            .att.font_size(fsize)
-            .text(i => labels[i])
-            .each(function (i) {
-                var tw = (selex(this).node() as SVGTextElement).getBBox().width;
+        var ty = this._textBase(), offset = [0] as number[], fsize = this._config.fontSize;
+        group.selectAll('text').att.x(padding).att.y(ty).att.font_size(fsize)
+            .text(i => labels[i]).each(function (i) {
+                const tw = (selex(this).node() as SVGTextElement).getBBox().width;
                 offset[i + 1] = offset[i] + padding + fsize * 1.2 + tw;
             });
         group.att.transform(i => `translate(${offset[i] + start},0)`);
@@ -55,7 +70,7 @@ export class Legend {
     }
 
     private _restyle(data: StringMap<string>, start: number): number {
-        let styles = Object.keys(data), fsize = +this._config.fontSize;
+        let styles = Object.keys(data), fsize = this._config.fontSize;
         let group = this._group(styles.length, 'style', 'line');
         let mid = this._textBase() - fsize * 0.7 / 2;
         let width = 2 * fsize, thick = width / 12;
@@ -97,11 +112,11 @@ export class Legend {
         return this._text(group, 2 * r + 4, colors.map(c => data[c]), start);
     }
 
-    private _textBase() {
+    private _textBase(): number {
         return this._config.fontSize + 2;
     }
 
-    public height(): number {
+    private _height(): number {
         return this._config.fontSize * 1.35 + 4;
     }
 }

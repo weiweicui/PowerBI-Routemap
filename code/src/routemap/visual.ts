@@ -4,42 +4,29 @@ import VisualUpdateOptions = powerbi.extensibility.visual.VisualUpdateOptions;
 import IVisual = powerbi.extensibility.visual.IVisual;
 import EnumerateVisualObjectInstancesOptions = powerbi.EnumerateVisualObjectInstancesOptions;
 import VisualObjectInstance = powerbi.VisualObjectInstance;
-import VisualObjectInstanceEnumerationObject = powerbi.VisualObjectInstanceEnumerationObject;
 import VisualTooltipDataItem = powerbi.extensibility.VisualTooltipDataItem;
 import { Format } from "./Format";
-import { Persist } from "../pbi/Persist";
-import * as app from '../lava/bingmap/routemap/app';
-import { RoutemapConfig } from '../lava/bingmap/routemap/config';
-import { Context } from '../pbi/Context';
-import { override, groupBy, StringMap, first, Func } from '../lava/type';
-import * as deepmerge from 'deepmerge';
-import * as route from '../lava/bingmap/routemap/route';
+import { Persist, tooltip, Context } from '../pbi';
+import * as app from '../lava/routemap/app';
+import { override, StringMap, copy, dict } from '../lava/type';
 import { ISelex, selex } from "../lava/d3";
-import { tooltip } from '../pbi/tooltip';
-import { MapFormat } from "../lava/bingmap/controller";
+import { MapFormat } from "../lava/bingmap";
 
-type C_T_S = 'color' | 'thick' | 'style';
-type Role = 'tooltip' | 'stamp' | 'latitude' | 'longitude' | 'route' | C_T_S;
-
-const CTS = ['color', 'thick', 'style'] as const;
+type Role = 'tooltip' | 'stamp' | 'latitude' | 'longitude' | 'route' | 'color' | 'thick' | 'style';
 
 const LEGEND = {
-    color: { role: 'color', default: 'color_default', label: 'color_label' } as const,
-    thick: { role: 'thick', default: 'thick_default', label: 'thick_label' } as const,
-    style: { role: 'style', default: 'style_default', label: 'style_label' } as const
+    color: { autofill: 'color_default', label: 'color_label' } as const,
+    thick: { autofill: 'thick_default', label: 'thick_label' } as const,
+    style: { autofill: 'style_default', label: 'style_label' } as const
 } as const;
 
-const persist = { map: new Persist<[Microsoft.Maps.Location, number]>('persist', 'centerzoom') } as const;
-
-function autoThick(key: string, deft: number) {
-    const result = +key || deft;
-    return result === deft || result > 36 ? deft : result;
-}
+const persist = {
+    map: new Persist<[Microsoft.Maps.Location, number]>('persist', 'centerzoom')
+} as const;
 
 export class Visual implements IVisual {
     private _target: HTMLElement;
     private _ctx = null as Context<Role, Format>;
-    private _config = null as Readonly<RoutemapConfig>;
     constructor(options: VisualConstructorOptions) {
         if (!options) {
             return;
@@ -47,15 +34,19 @@ export class Visual implements IVisual {
         this._target = options.element;
         tooltip.init(options);
         this._ctx = new Context(options.host, new Format());
-        this._ctx.fmt.color.bind('color', 'item', 'customize');
-        this._ctx.fmt.thick.bind('thick', 'item', 'customize');
+        this._ctx.fmt.color.bind('color', 'item', 'customize', 'auto', k => {
+            return { solid: { color: this._ctx.palette(k) } }
+        });
+        this._ctx.fmt.thick.bind('thick', 'item', 'customize', 'auto', k => {
+            return (+k) > 36 ? +this._ctx.config('thick', 'item') : (+k);
+        });
         this._ctx.fmt.style.bind('style', 'item', 'customize');
         this._ctx.fmt.arrow.bind('route', 'item', 'customize');
 
-        this._ctx.fmt.legend.bind('color', 'color_label', 'color');
-        this._ctx.fmt.legend.bind('thick', 'thick_label', 'thick');
-        this._ctx.fmt.legend.bind('style', 'style_label', 'style');
-        route.events.onGlyphCreated = group => tooltip.add(group, arg => {
+        this._ctx.fmt.legend.bind('color', 'color_label', 'color', 'color_default', '');
+        this._ctx.fmt.legend.bind('thick', 'thick_label', 'thick', 'thick_default', '');
+        this._ctx.fmt.legend.bind('style', 'style_label', 'style', 'style_default', '');
+        app.events.route.onGlyphCreated = group => tooltip.add(group, arg => {
             const row = arg.data.row;
             const columns = this._ctx.columns('tooltip');
             if (!columns || !columns.length) {
@@ -67,75 +58,101 @@ export class Visual implements IVisual {
             });
         });
         selex(this._target).sty.cursor('default');
-        route.events.onBadShape = show => selex('.iconMsg').sty.display(show ? null : 'none');
+        app.events.route.onBadShape = show => selex('.iconMsg').sty.display(show ? null : 'none');
     }
 
-    private config(): RoutemapConfig {
-        const ctx = this._ctx;
-        const config = new RoutemapConfig();
-        //legend field
-        override(ctx.config('legend'), config.legend);
-        for (const v of CTS) {
-            config.legend[v] = this._buildLegendItems(v);
+    private _interval(): number {
+        const interval = +this._ctx.meta.arrow.interval;
+        if (interval <= 0 || isNaN(interval)) {
+            return Math.max((this._ctx.rows().length || 50) / 50, 1);
         }
-        //map field
-        override(deepmerge(ctx.config('mapControl'), ctx.config('mapElement')), config.map);
-        //glyph field
-        override(ctx.config('arrow'), config.glyph);
+        return interval;
+    }
 
-        const glyph = ctx.fmt.arrow.property('item');
-        config.glyph.active = r => config.glyph.show && glyph(r);
+    private _fillRouteConfig(config: app.Config['route']) {
+        const ctx = this._ctx;
+        if (!ctx.meta.arrow.show) {
+            config.glyph.active = r => false;
+        }
+        else {
+            const arrow = ctx.meta.arrow, glyph = ctx.fmt.arrow.item('item');
+            config.glyph.active = r => glyph(r);
+            if (arrow.start) {
+                config.glyph.start = { scale: +arrow.startScale };
+            }
+            if (arrow.middle) {
+                config.glyph.middle = { scale: +arrow.middleScale, interval: this._interval() };
+            }
+            if (arrow.end) {
+                if (arrow.endShape === 'customize') {
+                    config.glyph.end = {
+                        scale: +arrow.endScale,
+                        direction: arrow.endDirectional,
+                        custom: arrow.endData
+                    };
+                }
+                else if (arrow.endShape === 'image') {
+                    config.glyph.end = {
+                        scale: +arrow.endScale,
+                        direction: arrow.endDirectional,
+                        image: arrow.endImage
+                    }
+                }
+                else {
+                    config.glyph.end = {
+                        scale: +arrow.endScale,
+                        direction: arrow.endDirectional,
+                        builtin: arrow.endShape
+                    }
+                }
+            }
+        }
 
         //lat/lon
-        const lat = ctx.value('latitude'), lon = ctx.value('longitude');
-        config.lat = r => +lat(r);
-        config.lon = r => +lon(r);
-
-        //category
-        config.color = this._property('color') as Func<number, string>;
-        config.thick = this._property('thick') as Func<number, number>;
-        config.style = ctx.fmt.style.property('item');
-
-        if (config.glyph.interval <= 0 || isNaN(config.glyph.interval)) {
-            config.glyph.interval = Math.max((ctx.rows().length || 50) / 50, 1);
+        const lat = ctx.reader('latitude'), lon = ctx.reader('longitude');
+        config.data = {
+            lat: r => +lat(r),
+            lon: r => +lon(r),
+            color: ctx.fmt.color.item('item'),
+            thick: ctx.fmt.thick.item('item'),
+            style: ctx.fmt.style.item('item'),
+            nonzero: ctx.meta.advance.nonzero,
+            onlyvalid: ctx.meta.advance.onlyvalid
         }
+        copy(ctx.meta.mapControl, config, ['autofit']);
+    }
 
-        //nonzero, onlyvalid
-        override(ctx.config('advance'), config);
+    private _config(): app.Config {
+        const ctx = this._ctx, config = new app.Config();
+        //legend field
+        override(ctx.meta.legend, config.legend);
+
+        config.legend.color = this._buildLegendItems('color');
+        config.legend.thick = this._buildLegendItems('thick');
+        config.legend.style = this._buildLegendItems('style');
+
+        //map field
+        copy(ctx.meta.mapControl, copy(ctx.meta.mapElement, config.map));
+
+        //glyph field
+        this._fillRouteConfig(config.route);
+
         //autofit
-        override(ctx.config('mapControl'), config);
+        copy(ctx.meta.mapControl, config.route, ['autofit']);
         return config;
     }
 
-    private _buildLegendItems(role: C_T_S): StringMap<string> {
-        const ctx = this._ctx;
-        const legend = ctx.config('legend');
-        if (!legend[role]) {
-            //hide legend
-            return {};
+    private _buildLegendItems(role: 'color' | 'thick' | 'style'): StringMap<string> {
+        const ctx = this._ctx, legend = ctx.fmt.legend, { autofill, label } = LEGEND[role];
+        if (!legend.config(role)) {
+            return {};//hide legend
         }
-        const cat = ctx.cat(role), defaultLabel = LEGEND[role].label;
-        const autofill = legend[LEGEND[role].default];
-        if (!cat || !ctx.fmt[role].meta.customize) {
-            const txt = (legend[defaultLabel] || '').trim();
-            return txt ? { [ctx.metaValue(role, 'item')]: txt } : {};
+        const arr = ctx.labels(ctx.binding(role, 'item'), legend.special(label));
+        if (legend.config(autofill)) {
+            return dict(arr, a => a.key, a => a.value || a.auto);
         }
         else {
-            //has cat && customized
-            const key = ctx.cat(role).key;
-            const customLabels = ctx.fmt.legend.special(defaultLabel);
-            const result = {} as StringMap<string>;
-            const groups = groupBy(cat.distincts(), this._property(role));
-            for (const g in groups) {
-                const row = first(groups[g], r => key(r) in customLabels);
-                if (row !== undefined) {
-                    result[g] = customLabels[key(row)] as string;
-                }
-                else if (autofill) {
-                    result[g] = groups[g].map(r => key(r)).join(', ');
-                }
-            }
-            return result;
+            return dict(arr.filter(a => a.value), a => a.key, a => a.value);
         }
     }
 
@@ -174,136 +191,96 @@ export class Visual implements IVisual {
 
     private _inited = false;
     private _initing = false;
-    private _options = null as VisualUpdateOptions;
 
     public update(options: VisualUpdateOptions) {
-        const view = options.dataViews && options.dataViews[0];
+        const view = options.dataViews && options.dataViews[0] || {} as powerbi.DataView;
         if (Persist.update(view)) {
             // console.log("Return due to persist update");
             return;
         }
         if (this._initing) {
-            this._options = options;
             return;
         }
+        const ctx = this._ctx.update(view);
         if (!this._inited) {
-            this._options = options;
             this._initing = true;
             const mapFmt = new MapFormat();
-            override(this._ctx.metaObj(view, 'mapControl'), mapFmt);
-            override(this._ctx.metaObj(view, 'mapElement'), mapFmt);
+            override(ctx.original('mapControl'), override(ctx.original('mapElement'), mapFmt));
             app.init(this._target, mapFmt, ctl => {
                 this._setupIconDiv(selex(this._target).append('div'));
                 const [center, zoom] = persist.map.value() || [null, null];
                 center && ctl.map.setView({ center, zoom });
-                ctl.add({ transform: (c, p, e) => e && persist.map.write([c.map.getCenter(), c.map.getZoom()], 400) });
+                ctl.add({
+                    transform: (c, _, e) => e && persist.map.write([c.map.getCenter(), c.map.getZoom()], 400)
+                });
                 this._initing = false;
-                this.update(this._options);
-                this._options = null;
+                app.reset(this._config(), this._data());
             });
             this._inited = true;
         }
         else {
-            if (options.type === 4 || options.type === 32 || options.type === 36) {
+            if (ctx.isResizeVisualUpdateType(options)) {
                 return;
             }
-            const ctx = this._ctx;
-            ctx.update(view);
-            const valid = ctx.cat('stamp') && ctx.cat('latitude') && ctx.cat('longitude');
-            this._config = this.config();
-            if (ctx.dirtyFormat()) {
-                if (ctx.dirtyFormat(['color', 'thick', 'style', 'advance', 'arrow'])) {
-                    app.reset(this._config, valid ? ctx.group('route') : []);
+            const config = this._config(), route = config.route;
+            if (ctx.dirty()) {
+                config.route = { autofit: route.autofit };
+                if (ctx.dirty(['color', 'thick', 'style', 'advance'])) {
+                    config.route.data = route.data;
                 }
-                else {
-                    if (ctx.fmt.legend.dirty()) {
-                        app.repaint(this._config, 'legend');
-                    }
-                    if (ctx.fmt.mapControl.dirty() || ctx.fmt.mapElement.dirty()) {
-                        if (ctx.fmt.mapControl.dirty(['type', 'lang', 'pan', 'zoom']) || ctx.fmt.mapElement.dirty()) {
-                            app.repaint(this._config, 'map');
-                        }
-                        if (ctx.fmt.mapControl.dirty('autofit') === 'on') {
-                            app.tryFitView();
-                        }
-                    }
+                if (ctx.dirty(['arrow'])) {
+                    config.route.glyph = route.glyph;
                 }
+                if (!ctx.dirty(['mapControl', 'mapElement'])) {
+                    config.map = null;
+                }
+                app.reset(config, null);
             }
             else {
-                app.reset(this._config, valid ? ctx.group('route') : []);
-                app.tryFitView();
+                app.reset(config, this._data());
             }
         }
     }
 
-    private _property(role: C_T_S) {
-        let auto = undefined as Func<string, string | number>, ctx = this._ctx;
-        if (role === 'color' && ctx.fmt.color.meta.auto) {
-            auto = k => ctx.palette(k);
-        }
-        if (role === 'thick' && ctx.fmt.thick.meta.auto) {
-            const thick = ctx.fmt.thick.meta.item;
-            auto = k => autoThick(k, thick);
-        }
-        return ctx.property(role, 'item', auto);
+    private _data(): number[][] {
+        const ctx = this._ctx;
+        return (ctx.cat('stamp') && ctx.cat('latitude') && ctx.cat('longitude')) ? ctx.group('route') : [];
     }
 
-    public enumerateObjectInstances(options: EnumerateVisualObjectInstancesOptions): VisualObjectInstance[] | VisualObjectInstanceEnumerationObject {
-        const oname = options.objectName, ctx = this._ctx;
+    public enumerateObjectInstances(options: EnumerateVisualObjectInstancesOptions): VisualObjectInstance[] {
+        const oname = options.objectName, ctx = this._ctx, fmt = ctx.fmt;
         switch (oname) {
             case 'legend':
-                const legend = ctx.fmt.legend;
-                const ins = legend.instancer().metas(['show', 'position', 'fontSize']);
-                for (const role of CTS) {
-                    const key = LEGEND[role];
-                    const prop = this._property(role);
-                    ins.metas([role]);
-                    if (ctx.fmt[role].meta.customize && ctx.cat(role)) {
-                        if (legend.meta[role]) {
-                            ins.metas([key.default]);
-                            ins.items(key.label, null, prop, legend.meta[key.default]);
-                        }
-                    }
-                    else if (legend.meta[role]) {
-                        ins.metas([key.label]);
-                    }
-                }
-                return ins.dump();
+                return fmt.legend.dumper()
+                    .metas(['show', 'position', 'fontSize'])
+                    .labels(ctx.binding('color', 'item'), LEGEND['color'].label, true)
+                    .labels(ctx.binding('thick', 'item'), LEGEND['thick'].label, true)
+                    .labels(ctx.binding('style', 'item'), LEGEND['style'].label, true)
+                    .result;
             case 'mapControl':
+                return fmt.mapControl.dumper().default;
             case 'mapElement':
-                return ctx.fmt[oname].objectInstances();
+                return fmt.mapElement.dumper().default;
             case 'color':
+                return fmt.color.dumper().specification('item').result;
             case 'thick':
-                const temp = ctx.fmt[oname].instancer().metas(['item']);
-                if (ctx.cat(oname)) {
-                    temp.metas(['customize']);
-                    if (ctx.fmt[oname].meta.customize) {
-                        temp.metas(['auto']);
-                        temp.items('item', null, null, this._property(oname));
-                    }
-                }
-                return temp.dump();
+                return fmt.thick.dumper().specification('item').result;
             case 'style':
-                const style = ctx.fmt[oname].instancer().metas(['item']);
-                if (ctx.cat(oname)) {
-                    style.conditionalItems('item');
-                }
-                return style.dump();
+                return fmt.style.dumper().specification('item').result;
             case 'arrow':
-                const { end, endShape, show } = ctx.config('arrow');
-                const inst = ctx.fmt.arrow.instancer().metas(['show']);
+                const { end, endShape, show } = ctx.meta.arrow;
+                const inst = ctx.fmt.arrow.dumper().metas(['show']);
                 if (!show) {
-                    return inst.dump();
+                    return inst.result;
                 }
-                inst.conditionalMetas('start', ['startScale'])
-                    .conditionalMetas('middle', ['interval', 'middleScale'], { interval: this._config.glyph.interval })
-                    .conditionalMetas('end', ['endScale', 'endShape'])
-                    .conditionalMetas(endShape === 'customize' && end, ['endData', 'endDirectional'])
-                    .conditionalMetas(endShape === 'image' && end, ["endImage", 'endDirectional']);
-                if (ctx.cat('route')) {
-                    inst.conditionalItems('item');
-                }
-                return inst.dump();
+                return inst
+                    .metas('start', ['startScale'])
+                    .metas('middle', ['interval', 'middleScale'], { interval: this._interval() })
+                    .metas('end', ['endScale', 'endShape'])
+                    .metas(endShape === 'customize' && end, ['endData', 'endDirectional'])
+                    .metas(endShape === 'image' && end, ["endImage", 'endDirectional'])
+                    .items(!!ctx.cat('route'), 'item')
+                    .result;
         }
     }
 }

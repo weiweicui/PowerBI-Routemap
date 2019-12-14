@@ -94,7 +94,7 @@
                     "type": {"text": true}
                 },
                 "color_default": {
-                    "displayName": "• (Autofill)",
+                    "displayName": "> (Autofill)",
                     "description": "Show default labels if unspecified",
                     "type": { "bool": true }
                 },
@@ -104,7 +104,7 @@
                     "type": {"text": true}
                 },
                 "style_default": {
-                    "displayName": "• (Autofill)",
+                    "displayName": "> (Autofill)",
                     "description": "Show default labels if unspecified",
                     "type": { "bool": true }
                 },
@@ -114,7 +114,7 @@
                     "type": {"text": true}
                 },
                 "thick_default": {
-                    "displayName": "• (Autofill)",
+                    "displayName": "> (Autofill)",
                     "description": "Show default labels if unspecified",
                     "type": { "bool": true }
                 },
@@ -129,11 +129,11 @@
             "description": "Color mapping",
             "properties": {
                 "customize":{
-                    "displayName": "Specify individuals",
+                    "displayName": "Specify individually",
                     "type": { "bool": true}
                 },
                 "auto": {
-                    "displayName": "• (Autofill)",
+                    "displayName": "> (Autofill)",
                     "description": "Populate distinct colors if unspecified",
                     "type": { "bool": true }
                 },
@@ -152,11 +152,11 @@
             "description": "Thickness mapping",
             "properties": {
                 "customize":{
-                    "displayName": "Specify individuals",
+                    "displayName": "Specify individually",
                     "type": { "bool": true}
                 },
                 "auto": {
-                    "displayName": "• (Autofill, when < 32)",
+                    "displayName": "> (Autofill, when < 32)",
                     "description": "Populate distinct widths if unspecified",
                     "type": { "bool": true }
                 },
@@ -175,7 +175,7 @@
             "description": "Dash style mapping",
             "properties": {
                "customize":{
-                    "displayName": "Specify individuals",
+                    "displayName": "Specify individually",
                     "type": { "bool": true}
                 },
                 "item":{
@@ -202,7 +202,7 @@
                     "type": {"bool": true }
                 },
                 "interval": {
-                    "displayName": "• Interval",
+                    "displayName": "> Interval",
                     "type": {"numeric": true}
                 },
                 "start": {
@@ -210,7 +210,7 @@
                     "type": {"bool": true }
                 },
                 "startScale": {
-                    "displayName": "• Scale",
+                    "displayName": "> Scale",
                     "type": {"numeric": true}
                 },
                 "middle": {
@@ -218,7 +218,7 @@
                     "type": {"bool": true }
                 },
                 "middleScale": {
-                    "displayName": "• Scale",
+                    "displayName": "> Scale",
                     "type": {"numeric": true}
                 },
                 "end": {
@@ -226,7 +226,7 @@
                     "type": {"bool": true }
                 },
                 "endShape": {
-                    "displayName": "• Icon",
+                    "displayName": "> Icon",
                     "type": {"enumeration": [
                         {"displayName": "Arrow", "value": "triangle"},
                         {"displayName": "Car (top)", "value": "car1"},
@@ -240,17 +240,17 @@
                     ]}
                 },
                 "endData":{
-                    "displayName": "• Shape data",
+                    "displayName": "> Shape data",
                     "description": "In the svg format, anchored at (0,0)",
                     "type": { "text": true }
                 },
                 "endImage":{
-                    "displayName": "• Image URL",
+                    "displayName": "> Image URL",
                     "description": "Accept PNG or JPEG files",
                     "type": { "text": true }
                 },
                 "endDirectional":{
-                    "displayName": "• Direction",
+                    "displayName": "> Direction",
                     "description": "Rotate this icon to align with the path",
                     "type": {"enumeration": [
                         {"displayName": "Up", "value": "up"},
@@ -260,11 +260,11 @@
                     ]}
                 },
                 "endScale": {
-                    "displayName": "• Scale",
+                    "displayName": "> Scale",
                     "type": {"numeric": true}
                 },
                 "customize":{
-                    "displayName": "Specify individuals",
+                    "displayName": "Specify individually",
                     "type": { "bool": true}
                 },
                 "item":{
