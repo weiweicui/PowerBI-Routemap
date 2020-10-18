@@ -231,8 +231,8 @@ function customStyle(v: IMapFormat): Microsoft.Maps.ICustomMapStyle {
         result.elements.building = { visible: false };
     }
     result.elements.mapElement = { labelVisible: v.label };
-    result.elements.political = { labelVisible: v.label, visible: true };
-    result.elements.district = { labelVisible: v.label, visible: true };
+    result.elements.political = { labelVisible: v.label };
+    result.elements.district = { labelVisible: v.label };
     if (v.road === 'gray' || v.road === 'gray_label') {
         result.elements.transportation = {
             visible: true,
