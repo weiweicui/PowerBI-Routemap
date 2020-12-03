@@ -29,8 +29,8 @@ export function init(div: HTMLElement, mapFmt: MapFormat, then: Func<Controller,
     });
 }
 
-export function reset(fmt: Config, data: number[][]) {
+export function reset(fmt: Config, data: number[][], init = false) {
     fmt.legend && legend.update(fmt.legend);
     fmt.map && mapctl.restyle(fmt.map);
-    fmt.route && route.reset(data, mapctl, fmt.route);
+    fmt.route && route.reset(data, mapctl, fmt.route, init);
 }

@@ -40,7 +40,7 @@ let _fmt = new Config();
 let _input = [] as number[][];
 let _routes = [] as Route[];
 let _visuals = [] as VisualRoute[];
-export function reset(input: number[][], ctl: Controller, config: Partial<Config>) {
+export function reset(input: number[][], ctl: Controller, config: Partial<Config>, init = false) {
     const turnon = !_fmt.autofit && config.autofit;
     copy(config, _fmt);
     _input = input || _input;
@@ -54,10 +54,10 @@ export function reset(input: number[][], ctl: Controller, config: Partial<Config
         _visuals.forEach(v => v.transform(ctl));
     }
     if (input) {
-        input.length && _fmt.autofit && ctl.fitView(_visuals.map(v => v.bound()));
+        input.length && _fmt.autofit && !init && ctl.fitView(_visuals.map(v => v.bound()));
     }
     else {
-        _input.length && turnon && ctl.fitView(_visuals.map(v => v.bound()));
+        _input.length && turnon && !init && ctl.fitView(_visuals.map(v => v.bound()));
     }
 }
 

@@ -164,7 +164,7 @@ export class Visual implements IVisual {
         center && ctl.setCenterZoom(center, zoom);
         ctl.add({ transform: (c, _, e) => e && this._persist.map.write([c.map.getCenter(), c.map.getZoom()], 400) });
         this._initing = false;
-        app.reset(this._config(), this._data());
+        app.reset(this._config(), this._data(), true);
       });
       this._inited = true;
     }
